@@ -1,90 +1,185 @@
-<!-- $Id: tencent_cos.htm 16854 2020-09-25 $ -->
 {include file="pageheader.htm"}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+<script src="../admin/js/jquery.min.js"></script>
+{insert_scripts files="../js/utils.js,selectzone.js,colorselector.js,listtable.js"}
 
-<div class="main-div">
-    <form method="post" action="?act=save_config" name="theForm" onsubmit="return validate()">
-        <table width="100%">
+<div class="tab-div">
+    <!-- tab bar -->
+    <div id="tabbar-div">
+        <p>
+            <span class="tab-front" id="general-tab">{$lang.general}</span>
+            <span class="tab-back" id="whitelist-tab">{$lang.whitelist}</span>
+            <span class="tab-back" id="record-tab">{$lang.record}</span>
+        </p>
+    </div>
+
+    <!-- tab body -->
+    <div id="tabbody-div">
+        <form method="post" action="?act=save_config" name="theForm" onsubmit="return validate()">
+            <table width="90%" id="general-table" class="gk-table">
+                <tr>
+                    <td class="label">
+                        <a href="javascript:showNotice('notice_tms_on');" title="点击此处查看提示信息"><img src="images/notice.svg"
+                                                                                                  width="16" height="16"
+                                                                                                  border="0"
+                                                                                                  alt="点击此处查看提示信息"></a>
+                        {$lang.tms_on}:
+                    </td>
+                    <td>
+                        <input type="radio" name="switch" id="switch_on" value="1" onclick="switchTms(1)"/>{$lang.yes}
+                        <input type="radio" name="switch" id="switch_off" value="0" onclick="switchTms(0)"/>{$lang.no}
+                        <br>
+                        <span class="notice-span" style="display:block" id="notice_tms_on">{$lang.TmsOnNotice}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">{$lang.custome_secret}:</td>
+                    <td>
+                        <input type="radio" name="custome_secret" id="custome_secret_yes" value="1" onclick="switchKey(1)"/>{$lang.yes}
+                        <input type="radio" name="custome_secret" id="custome_secret_no" value="0" onclick="switchKey(0)"/>{$lang.no}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">{$lang.SecretId}:</td>
+                    <td class="panel-par">
+                        <input name="secret_id" id="secretId" type="password" value="{$tms.secret_id}" size="40">
+                        <i class="far fa-eye fa-eye-slash" id="togglePassword_secretid"
+                           onclick="toggle_password('secretId', 'togglePassword_secretid')"></i>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">{$lang.SecretKey}:</td>
+                    <td class="panel-par">
+                        <input name="secret_key" id="secretKey" type="password" value="{$tms.secret_key}" size="40">
+                        <i class="far fa-eye fa-eye-slash" id="togglePassword_secretkey"
+                           onclick="toggle_password('secretKey', 'togglePassword_secretkey')"></i>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <input type="submit" value="{$lang.button_submit}" class="button"/>
+                        <input type="hidden" id="custome_secret" value="{$tms.custome_secret}"/>
+                        <input type="hidden" id="switch" value="{$tms.switch}"/>
+                        <input type="hidden" id="action" value="{$act}"/>
+                    </td>
+                </tr>
+            </table>
+
+
+            <table width="90%" id="whitelist-table" style="display:none">
+                <tr>
+                    <td class="label">
+                        <a href="javascript:showNotice('notice_whitelist');" title="点击此处查看提示信息"><img src="images/notice.svg"
+                                                                                                  width="16" height="16"
+                                                                                                  border="0"
+                                                                                                  alt="点击此处查看提示信息"></a>
+                        {$lang.whitelist}:</td>
+                    <td colspan="2">
+                        <textarea name="whitelist" cols="80" rows="5" id="whitelist">{$tms.whitelist}</textarea>
+                        <br>
+                        <span class="notice-span" style="display:block" id="notice_whitelist">{$lang.placeholder}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <input type="submit" value="{$lang.button_submit}" class="button"/>
+                    </td>
+                </tr>
+            </table>
+        </form>
+
+        <table width="100%" id="record-table" style="display:none">
             <tr>
-                <td class="label">
-                    <a href="javascript:showNotice('notice_tms_on');" title="点击此处查看提示信息"><img src="images/notice.svg"
-                                                                                              width="16" height="16"
-                                                                                              border="0"
-                                                                                              alt="点击此处查看提示信息"></a>
-                    {$lang.tms_on}:
-                </td>
                 <td>
-                    <input type="radio" name="switch" id="switch_on" value="1" onclick="switchTms(1)"/>{$lang.yes}
-                    <input type="radio" name="switch" id="switch_off" value="0" onclick="switchTms(0)"/>{$lang.no}
-                    <br>
-                    <span class="notice-span" style="display:block" id="notice_tms_on">{$lang.TmsOnNotice}</span>
+                    {include file="tencent_tms_search.htm"}
                 </td>
             </tr>
             <tr>
-                <td class="label">{$lang.custome_secret}:</td>
                 <td>
-                    <input type="radio" name="custome_secret" id="custome_secret_yes" value="1" onclick="switchKey(1)"/>{$lang.yes}
-                    <input type="radio" name="custome_secret" id="custome_secret_no" value="0" onclick="switchKey(0)"/>{$lang.no}
-                </td>
-            </tr>
+                    <div class="list-div" id="listDiv">
+                        <table>
+                            <tr>
+                                <th><a href="javascript:listTable.sort('uid'); ">{$lang.uid}</a></th>
+                                <th><a href="javascript:listTable.sort('user_name'); ">{$lang.user_name}</a></th>
+                                <th><a href="javascript:listTable.sort('keywords'); ">{$lang.keywords}</a></th>
+                                <th><a href="javascript:listTable.sort('evil_label'); ">{$lang.evil_label}</a></th>
+                                <th style="width: 40%"><a href="javascript:listTable.sort('text'); ">{$lang.text}</a></th>
+                                <th><a href="javascript:listTable.sort('time'); ">{$lang.time}</a></th>
+                            </tr>
+                            {foreach from=$keywords item=keyword}
+                            <tr>
+                                <td align="center">{$keyword.uid}</td>
+                                <td align="center">{$keyword.username}</td>
+                                <td align="center">{$keyword.keyword}</a></td>
+                                <td align="center">{$keyword.evil_label}</td>
+                                <td align="center">{$keyword.examine_text}</td>
+                                <td align="center">{$keyword.examine_date}</td>
+                            </tr>
+                            {foreachelse}
+                            <tr><td class="no-records" colspan="10">{$lang.no_records}</td></tr>
+                            {/foreach}
+                        </table>
 
-            <tr>
-                <td class="label">{$lang.SecretId}:</td>
-                <td class="panel-par">
-                    <input name="secret_id" id="secretId" type="password" value="{$tms.secret_id}" size="40">
-                    <i class="far fa-eye fa-eye-slash" id="togglePassword_secretid"
-                       onclick="toggle_password('secretId', 'togglePassword_secretid')"></i>
-                </td>
-            </tr>
-
-            <tr>
-                <td class="label">{$lang.SecretKey}:</td>
-                <td class="panel-par">
-                    <input name="secret_key" id="secretKey" type="password" value="{$tms.secret_key}" size="40">
-                    <i class="far fa-eye fa-eye-slash" id="togglePassword_secretkey"
-                       onclick="toggle_password('secretKey', 'togglePassword_secretkey')"></i>
-
-                </td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>
-                    <input type="submit" value="{$lang.button_submit}" class="button"/>
-                    <input type="hidden" id="custome_secret" value="{$tms.custome_secret}"/>
-                    <input type="hidden" id="switch" value="{$tms.switch}"/>
+                    </div>
                 </td>
             </tr>
         </table>
-    </form>
-    <div>
-        <table style="text-align: center">
-            <tbody>
-            <tr>
-                <td align="center">
+        <div style="text-align:center">
+            <table style="margin:auto">
+                <tbody>
+                <tr>
+                    <td align="center">
                     <span>
                         <a href="https://openapp.qq.com/docs/Ecshop/tms.html" target="_blank">文档中心</a>
                     </span>
-                    <span class="link-span">
+                        <span class="link-span">
                        <a href="https://github.com/Tencent-Cloud-Plugins/tencentcloud-ecshop-plugin-tms/"
                           target="_blank">GitHub</a>
                     </span>
-                    <span class="link-span">
+                        <span class="link-span">
                         <a href="https://da.do/y0rp" target="_blank">反馈建议</a>
                     </span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-{insert_scripts files="../js/utils.js,validator.js"}
+
+{insert_scripts files="validator.js,tab.js"}
 {literal}
 <script language="JavaScript">
     <!--
+    let action = document.getElementById('action').value;
+    if (action && action === "get_record") {
+        document.getElementById('general-tab').className = 'tab-back';
+        document.getElementById('general-tab').className = 'tab-back';
+        document.getElementById('record-tab').className = 'tab-front';
+        document.getElementById('general-table').style.display = 'none';
+        document.getElementById('whitelist-table').style.display = 'none';
+        document.getElementById('record-table').style.display = (Browser.isIE) ? "block" : "table";
 
-    onload = function () {
-        // 开始检查订单
-        startCheckOrder();
+        let evillabel = document.getElementById('input_evillabel').value;
+        let evil_element = document.getElementById('evillabel');
+        for(let i = 0;i<evil_element.length;i++){
+            if (evillabel === evil_element.options[i].value) {
+                evil_element.options[i].selected=true;
+            }
+        }
+
+        let pagesize = document.getElementById('hide_pagesize').value;
+        let pagesize_element = document.getElementById('page_size');
+        for(let i = 0;i<pagesize_element.length;i++){
+            if (pagesize === pagesize_element.options[i].value) {
+                pagesize_element.options[i].selected=true;
+            }
+        }
     }
 
     let tms_on = document.getElementById('switch').value;
