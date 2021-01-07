@@ -1,0 +1,26 @@
+<div class="form-div">
+    <form method="post" action="?act=get_record" name="searchForm">
+        {$lang.user_name}<input type="text" name="username" id="username" value="{$filter.username}" size="25"/>
+        {$lang.keywords}<input type="text" name="keyword" id="keyword" value="{$filter.keyword}" size="25"/>
+        {$lang.evil_label}
+        <select name="evillable" id="evillabel">
+            <option value="">{$lang.selectOption}</option>
+            <option value="Polity">{$lang.Polity}</option>
+            <option value="Porn">{$lang.Porn}</option>
+            <option value="Illegal">{$lang.Illegal}</option>
+            <option value="Abuse">{$lang.Abuse}</option>
+            <option value="Terror">{$lang.Terror}</option>
+            <option value="Custom">{$lang.Custom}</option>
+        </select>
+        {$lang.page_count}<input type="text" name="page_count" id="page_count" value="{$filter.page_count}" size="5"/>
+        {$lang.page_size}<select name="page_size" id="page_size">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="50">50</option>
+    </select>
+        <button type="submit" class="btn">{$lang.button_search}</button>
+        <input type="text" hidden="hidden" disabled="disabled" name="keyword" id="input_evillabel" value="{$filter.evillable}"/>
+        <input type="text" hidden="hidden" disabled="disabled" name="pagesize" id="hide_pagesize" value="{$filter.page_size}"/>
+    </form>
+</div>
